@@ -56,7 +56,7 @@ void Gestor::menu()
         cout << " Ingrese la opción a ejecutar: " << endl
              << " " << char(OPC_CAPTURAR) << ") Capturar usuario" << endl
              << " " << char(OPC_MOSTRAR) << ") Mostrar usuarios" << endl
-             << " " << char(OPC_BUSCAR) << ") Buscar usuario" << endl
+             << " " << char(OPC_BUSCAR) << ") Buscar usuario (por código)" << endl
              << " " << char(OPC_MODIFICAR) << ") Modificar usuario" << endl
              << " " << char(OPC_ELIMINAR) << ") Eliminar usuario" << endl
              << " " << char(OPC_SALIR) << ") Salir" << endl
@@ -64,6 +64,7 @@ void Gestor::menu()
 
         cin >> opc;
         cin.ignore();
+        CLEAR;
         switch (opc)
         {
             case OPC_CAPTURAR:
@@ -76,17 +77,16 @@ void Gestor::menu()
                 float altura;
                 float peso;
                 Usuario usuarioTmp;
-                
-                CLEAR;
 
                 cout << " Ingrese los siguientes datos: " << endl
                      << endl
                      << " Código: ";
-                cin >> codigo;
+                cin.ignore();
+                getline(cin, codigo);
                 cout << " Nombre: ";
-                cin >> nombre;
+                getline(cin, nombre);
                 cout << " Apellido: ";
-                cin >> apellido;
+                getline(cin, apellido);
                 cout << " Edad: ";
                 cin >> edad;
                 cout << " Género (M = masculino | F = femenino): ";
@@ -139,6 +139,37 @@ void Gestor::menu()
 
 void Gestor::buscar()
 {
+    string codigo;
+    unsigned int i;
+    cout << " Ingrese el código a buscar: ";
+    getline(cin, codigo);
+    if (!m_usuarios.size())
+        cout << endl << " Aún no se han ingresado usuarios " << endl
+             << " Presione ENTER para continuar..." << endl;
+    else
+    {
+        for (i = 0; i < m_usuarios.size(); i++)
+            if(m_usuarios[i].getCodigo() == codigo)
+            {
+
+                cout << endl
+                    << " Usuario #" << i + 1 << endl
+                    << " Código: " << m_usuarios[i].getCodigo() << endl
+                    << " Nombre: " << m_usuarios[i].getNombre() << endl
+                    << " Apellido: " << m_usuarios[i].getApellido() << endl
+                    << " Edad: " << m_usuarios[i].getEdad() << endl
+                    << " Género: " << m_usuarios[i].getGenero() << endl
+                    << " Peso: " << m_usuarios[i].getPeso() << endl
+                    << " Altura: " << m_usuarios[i].getAltura() << endl
+                    << "----------------------------------------------"
+                    << endl << endl
+                    << " Presione ENTER para continuar..." << endl;
+                break;
+            }
+        if (i == m_usuarios.size())
+            cout << endl
+                << " Código no encontrado, presione ENTER para continuar..." << endl;
+    }
 }
 
 void Gestor::capturar(const Usuario& usuario)
@@ -159,7 +190,16 @@ void Gestor::capturar(const Usuario& usuario)
 
 void Gestor::eliminar()
 {
-
+    unsigned int i;
+    for (i = 0; i < m_usuarios.size(); i++)
+    {
+    }
+    if (!i)
+    {
+        cout << endl
+             << " Aún no ha agregado datos, presione ENTER para continuar";
+        cin.get();
+    }
 }
 
 void Gestor::modificar()
