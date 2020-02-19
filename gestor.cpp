@@ -63,14 +63,14 @@ void Gestor::menu()
              << " Opción: ";
 
         cin >> opc;
-        cin.ignore();
         CLEAR;
+        cin.ignore();
         switch (opc)
         {
             case OPC_CAPTURAR:
             {
                 Usuario usuarioTmp;
-                capturarDatos(usuarioTmp);
+                capturar_datos(usuarioTmp);
                 capturar(usuarioTmp);
                 cin.ignore();
             }
@@ -109,17 +109,17 @@ void Gestor::buscar()
 {
     string codigo;
     unsigned int i;
-    cout << " Ingrese el código a buscar: ";
-    getline(cin, codigo);
     if (!m_usuarios.size())
-        cout << endl << " Aún no se han ingresado usuarios " << endl
+        cout << " Aún no se han ingresado usuarios " << endl << endl
              << " Presione ENTER para continuar..." << endl;
     else
     {
+        cout << " Ingrese el código a buscar: ";
+        getline(cin, codigo);
         for (i = 0; i < m_usuarios.size(); i++)
             if(m_usuarios[i].getCodigo() == codigo)
             {
-
+                CLEAR;
                 cout << endl
                     << " Usuario #" << i + 1 << endl
                     << " Código: " << m_usuarios[i].getCodigo() << endl
@@ -158,6 +158,7 @@ void Gestor::capturar(const Usuario& usuario)
 void Gestor::eliminar()
 {
     unsigned int i;
+
     mostrar();
     if (m_usuarios.size())
     {
@@ -169,9 +170,13 @@ void Gestor::eliminar()
             escribir();
         }
         else
+        {
+
             cout << endl
                 << " Dato inválido, presione ENTER para continuar..."
                 << endl;
+            cin.get();
+        }
     }
 }
 
@@ -179,27 +184,61 @@ void Gestor::modificar()
 {   
     Usuario usuarioTmp;
     unsigned int i;
-    mostrar();
+    char opc;
 
+    mostrar();
     if (m_usuarios.size())
     {
-        cout << " Ingrese número del usuario a eliminar: ";
+        cout << " Ingrese número del usuario a modificar: ";
         cin >> i;
 
         if (i <= m_usuarios.size() && i)
-        {
-            capturarDatos(usuarioTmp);
+        {   
+            do
+            {
+                cout << endl
+                     << " Seleccione el campo a modificar:" << endl;
+                cout << char(CAMPO_NOM) << ") Nombre" << endl
+                     << char(CAMPO_APE) << ") Apellido" << endl
+                     << char(CAMPO_EDAD) << ") Edad" << endl
+                     << char(CAMPO_SEXO) << ") Sexo" << endl
+                     << char(CAMPO_PESO) << ") Peso" << endl
+                     << char(CAMPO_ALTURA) << ") Altura" << endl
+                     << char(CAMPO_CANCELAR) << ") Cancelar" << endl
+                     << "Opción: ";
+                cin >> opc;
+            }while(opc < CAMPO_NOM || opc > CAMPO_CANCELAR);
+            
+            if (opc != CAMPO_CANCELAR)
+            {
+                usuarioTmp.setAltura((m_usuarios.begin() + i - 1)->getAltura());
+                usuarioTmp.setApellido((m_usuarios.begin() + i - 1)->getApellido());
+                usuarioTmp.setCodigo((m_usuarios.begin() + i - 1)->getCodigo());
+                usuarioTmp.setEdad((m_usuarios.begin() + i - 1)->getEdad());
+                usuarioTmp.setGenero((m_usuarios.begin() + i - 1)->getGenero());
+                usuarioTmp.setNombre((m_usuarios.begin() + i - 1)->getNombre());
+                usuarioTmp.setPeso((m_usuarios.begin() + i - 1)->getPeso());
 
-            m_usuarios.erase(m_usuarios.begin() + i -1);
+                modificar_datos(usuarioTmp, opc);
 
-            m_usuarios.insert(m_usuarios.begin() + i - 1, usuarioTmp);
+                m_usuarios.erase(m_usuarios.begin() + i -1);
+                m_usuarios.insert(m_usuarios.begin() + i - 1, usuarioTmp);
 
-            escribir();
+                escribir();
+
+                cout << endl
+                     << " Dato modificado correctamente" << endl
+                     << " Presione ENTER para continuar..." << endl;
+            }
         }
+
         else
+        {
             cout << endl
                  << " Dato inválido, presione ENTER para continuar..."
                  << endl;
+            cin.get();       
+        }
     }
 }
 
@@ -219,8 +258,6 @@ void Gestor::mostrar()
              << endl;
     if (!i)
         cout << " Aún no se han ingresado usuarios" << endl;
-    cout << endl << endl
-         << " Presione ENTER para continuar" << endl;
 }
 
 void Gestor::escribir()
@@ -239,7 +276,7 @@ void Gestor::escribir()
                     << m_usuarios[i].getAltura() << '\n';
 }
 
-void Gestor::capturarDatos(Usuario& usuario)
+void Gestor::capturar_datos(Usuario& usuario)
 {
     string codigo;
     string nombre;
@@ -248,42 +285,89 @@ void Gestor::capturarDatos(Usuario& usuario)
     string genero;
     float altura;
     float peso;
+    bool continuar = false;
 
     // Expresiones regulares
     regex expCodigo("([1-9]{1}[0-9]{8})$");
-    regex expNombre("(?:[a-zA-ZñÑ]{4,})+(?: [a-zA-ZñÑ]{3,})?+");
+    regex expNombre("(?:[a-zA-ZñÑ]{4,})(?: [a-zA-ZñÑ]{4,})?{1,2}");
     regex expApellido("(?:[a-zA-ZñÑ]{4,})+(?: [a-zA-ZñÑ]{3,})$");
     regex expGenero("(?:[mMfF]){1}$");
     
     cout << " Presione ENTER para continuar e ingrese los siguientes datos"
          << endl << endl;
+
+    // Obtención de código
     do
     {
         CLEAR;
-        cout << " Código: ";
+        cout << " Código (9 dígitos): ";
         getline(cin, codigo);
-    } while (!regex_match(codigo, expCodigo));
+        cout << codigo_usado(codigo) << endl;
+        if (codigo_usado(codigo))
+        {
+            cout << endl
+                 << " Error, código en uso. Presione ENTER para continuar";
+            cin.get();
+        }
+        else if (!regex_match(codigo, expCodigo))
+        {
+            cout << endl
+                 << " Error el código debe de tener 9 dígitos y no debe de"
+                 << " empezar con cero" << endl
+                 << " Presione ENTER para continuar";
+            cin.get();
+        }
+        else
+            continuar = true;
+    } while (!continuar);
+    continuar = false;
 
+    // Obtención de nombre
     do
     {
         CLEAR;
         cout << " Nombre: ";
         getline(cin, nombre);
-    } while (!regex_match(nombre, expNombre));
+        if (!regex_match(nombre, expNombre))
+        {
+            cout << " Error, introducir mínimo un nombre y máximo tres "
+                 << endl
+                 << " (mínimo cuatro letras por nombre)"
+                 << endl
+                 << " Presione ENTER para continuar"
+                 << endl;
+            cin.get();
+        }
+        else
+            continuar = true;
+    } while (!continuar);
+    continuar = false;
 
+    // Obtención de apellido
     do
     {
         CLEAR;
         cout << " Apellido: ";
         getline(cin, apellido);
-    }while(!regex_match(apellido, expApellido));
+        if (!regex_match(apellido, expApellido))
+        {
+            cout << " Error, se deben de introducir dos apellidos"
+                 << " separados por espacios"
+                 << endl
+                 << " Presione ENTER para continuar"
+                 << endl;
+            cin.get();
+        }
+        else
+            continuar = true;
+    }while(!continuar);
 
     do
     {
         CLEAR;
-        cout << " Edad (de 1 a 115 años): ";
+        cout << " Edad (de 12 a 115 años): ";
         cin >> edad;
-    }while(edad > 115 || !edad);
+    }while(edad > 115 || edad < 12);
 
     do
     {
@@ -313,4 +397,128 @@ void Gestor::capturarDatos(Usuario& usuario)
     usuario.setGenero(genero[0]);
     usuario.setNombre(nombre);
     usuario.setPeso(peso);
+}
+
+bool Gestor::codigo_usado(const string codigo)
+{
+    for (int i = 0; i < m_usuarios.size(); i++)
+        if (codigo == m_usuarios[i].getCodigo())
+            return true;
+    return false;
+}
+
+void Gestor::modificar_datos(Usuario& usuario, char i)
+{
+    bool continuar = false;
+
+    // Expresiones regulares
+    regex expCodigo("([1-9]{1}[0-9]{8})$");
+    regex expNombre("(?:[a-zA-ZñÑ]{4,})(?: [a-zA-ZñÑ]{4,})?{1,2}");
+    regex expApellido("(?:[a-zA-ZñÑ]{4,})+(?: [a-zA-ZñÑ]{3,})$");
+    regex expGenero("(?:[mMfF]){1}$");
+
+    cin.ignore();
+    switch (i)
+    {
+        case CAMPO_NOM:
+        {
+            string nombre;
+            do
+            {
+                CLEAR;
+                cout << " Nombre: ";
+                getline(cin, nombre);
+                if (!regex_match(nombre, expNombre))
+                {
+                    cout << " Error, introducir mínimo un nombre y máximo tres "
+                        << endl
+                        << " (mínimo cuatro letras por nombre)"
+                        << endl
+                        << " Presione ENTER para continuar"
+                        << endl;
+                    cin.get();
+                }
+                else
+                    continuar = true;
+            } while (!continuar);
+            usuario.setNombre(nombre);
+        }
+        break;
+
+        case CAMPO_APE:
+        {
+            string apellido;
+            do
+            {
+                CLEAR;
+                cout << " Apellido: ";
+                getline(cin, apellido);
+                if (!regex_match(apellido, expApellido))
+                {
+                    cout << " Error, se deben de introducir dos apellidos"
+                        << " separados por espacios"
+                        << endl
+                        << " Presione ENTER para continuar"
+                        << endl;
+                    cin.get();
+                }
+                else
+                    continuar = true;
+            }while(!continuar);
+            usuario.setApellido(apellido);
+        }
+        break;
+
+        case CAMPO_EDAD:
+        {
+            unsigned int edad;
+            do
+            {
+                CLEAR;
+                cout << " Edad (de 12 a 115 años): ";
+                cin >> edad;
+            }while(edad > 115 || edad < 12);
+            usuario.setEdad(edad);
+        }
+        break;
+
+        case CAMPO_PESO:
+        {
+            float peso;
+            do
+            {
+                CLEAR;
+                cout << " Peso (de 30 a 300 kg): ";
+                cin >> peso;
+            }while(peso > 300 || peso < 30);
+            usuario.setPeso(peso);
+        }
+        break;
+
+        case CAMPO_SEXO:
+        {
+            string genero;
+            do
+            {
+                CLEAR;
+                cout << " Género (M = masculino | F = femenino): ";
+                cin >> genero;
+            } while(!regex_match(genero, expGenero));
+            usuario.setGenero(genero[0]);
+        }
+        break;
+
+        case CAMPO_ALTURA:
+        {
+            float altura;
+            do
+            {   
+                CLEAR;
+                cout << " Altura (de 0.8 a 2.5 mts): ";
+                cin >> altura;;
+            } while (altura < 0.8 || altura > 2.5);
+            usuario.setAltura(altura);
+        }
+        break;
+    }
 }

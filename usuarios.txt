@@ -1,3 +1,3 @@
-123|123|123|123|m|123|123
-123|123|123|123|m|123|123
-111111111|cristian|robles perez|115|f|30|0.8
+215472278|cristian ismael|robles perez|19|m|80|1.7
+215472279|laura|montes ramos|15|f|50|1.6
+215472277|pedro|mojarro lopez|40|m|60|1.4

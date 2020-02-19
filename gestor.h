@@ -27,7 +27,9 @@ public:
     void buscar();
     void eliminar();
     void escribir();
-    void capturarDatos(Usuario& usuario);
+    void capturar_datos(Usuario& usuario);
+    bool codigo_usado(const string codigo);
+    void modificar_datos(Usuario& usuario, char i);
 
 private:
     vector<Usuario> m_usuarios;
@@ -39,6 +41,17 @@ private:
         OPC_MODIFICAR,
         OPC_ELIMINAR,
         OPC_SALIR
+    };
+
+    enum CAMPOS
+    {
+        CAMPO_NOM = '1',
+        CAMPO_APE,
+        CAMPO_EDAD,
+        CAMPO_SEXO,
+        CAMPO_PESO,
+        CAMPO_ALTURA,
+        CAMPO_CANCELAR
     };
 };
 
