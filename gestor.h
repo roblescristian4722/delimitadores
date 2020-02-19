@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <regex>
 #include "usuario.h"
 using namespace std;
 
@@ -25,6 +26,8 @@ public:
     void modificar();
     void buscar();
     void eliminar();
+    void escribir();
+    void capturarDatos(const Usuario& usuario);
 
 private:
     vector<Usuario> m_usuarios;

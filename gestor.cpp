@@ -69,7 +69,7 @@ void Gestor::menu()
         {
             case OPC_CAPTURAR:
             {
-                string codigo;
+                string codigo = "";
                 string nombre;
                 string apellido;
                 unsigned int edad;
@@ -77,11 +77,11 @@ void Gestor::menu()
                 float altura;
                 float peso;
                 Usuario usuarioTmp;
-
-                cout << " Ingrese los siguientes datos: " << endl
+                
+                cout << " Ingrese los siguientes datos: "
+                     << endl
                      << endl
                      << " Código: ";
-                cin.ignore();
                 getline(cin, codigo);
                 cout << " Nombre: ";
                 getline(cin, nombre);
@@ -185,31 +185,94 @@ void Gestor::capturar(const Usuario& usuario)
     cout << endl
          << " Usuario añadido exitosamente." << endl
          << " Presione ENTER para continuar..." << endl;
-    cin.get();
 }
 
 void Gestor::eliminar()
 {
     unsigned int i;
-    for (i = 0; i < m_usuarios.size(); i++)
+    mostrar();
+    if (m_usuarios.size())
     {
-    }
-    if (!i)
-    {
-        cout << endl
-             << " Aún no ha agregado datos, presione ENTER para continuar";
-        cin.get();
+        cout << " Ingrese número del usuario a eliminar: ";
+        cin >> i;
+        if (i <= m_usuarios.size() && i)
+        {
+            m_usuarios.erase(m_usuarios.begin() + i - 1);
+            escribir();
+        }
+        else
+            cout << endl
+                << " Dato inválido, presione ENTER para continuar..."
+                << endl;
     }
 }
 
 void Gestor::modificar()
 {
+    string codigo;
+    string nombre;
+    string apellido;
+    unsigned int edad;
+    unsigned int i;
+    char genero;
+    float altura;
+    float peso;
+    Usuario usuarioTmp;
+    
+    mostrar();
 
+    if (m_usuarios.size())
+    {
+        cout << " Ingrese número del usuario a eliminar: ";
+        cin >> i;
+
+        if (i <= m_usuarios.size() && i)
+        {
+            cin.ignore();
+            cout << " Ingrese los siguientes datos: "
+                 << endl
+                 << endl
+                 << " Código: ";
+
+            getline(cin, codigo);
+            cout << " Nombre: ";
+            getline(cin, nombre);
+            cout << " Apellido: ";
+            getline(cin, apellido);
+            cout << " Edad: ";
+            cin >> edad;
+            cout << " Género (M = masculino | F = femenino): ";
+            cin >> genero;
+            cout << " Peso: ";
+            cin >> peso;
+            cout << " Altura: ";
+            cin >> altura;
+
+            usuarioTmp.setAltura(altura);
+            usuarioTmp.setApellido(apellido);
+            usuarioTmp.setCodigo(codigo);
+            usuarioTmp.setEdad(edad);
+            usuarioTmp.setGenero(genero);
+            usuarioTmp.setNombre(nombre);
+            usuarioTmp.setPeso(peso);
+
+            m_usuarios.erase(m_usuarios.begin() + i -1);
+
+            m_usuarios.insert(m_usuarios.begin() + i - 1, usuarioTmp);
+
+            escribir();
+        }
+        else
+            cout << endl
+                 << " Dato inválido, presione ENTER para continuar..."
+                 << endl;
+    }
 }
 
 void Gestor::mostrar()
 {
-    for (int i = 0; i < m_usuarios.size(); i++)
+    unsigned int i;
+    for (i = 0; i < m_usuarios.size(); i++)
         cout << " Usuario #" << i + 1 << endl
              << " Código: " << m_usuarios[i].getCodigo() << endl
              << " Nombre: " << m_usuarios[i].getNombre() << endl
@@ -220,4 +283,27 @@ void Gestor::mostrar()
              << " Altura: " << m_usuarios[i].getAltura() << endl
              << "----------------------------------------------"
              << endl;
+    if (!i)
+        cout << " Aún no se han ingresado usuarios" << endl;
+}
+
+void Gestor::escribir()
+{
+    fstream archivo("usuarios.txt", ios::out);
+    if (!archivo.is_open())
+        cerr << " Error en el archivo" << endl;
+    else
+        for (int i = 0; i < m_usuarios.size(); i++)
+            archivo << m_usuarios[i].getCodigo() << '|'
+                    << m_usuarios[i].getNombre() << '|'
+                    << m_usuarios[i].getApellido() << '|'
+                    << m_usuarios[i].getEdad() << '|'
+                    << m_usuarios[i].getGenero() << '|'
+                    << m_usuarios[i].getPeso() << '|'
+                    << m_usuarios[i].getAltura() << '\n';
+}
+
+void Gestor::capturarDatos(const Usuario& usuario)
+{
+    
 }
