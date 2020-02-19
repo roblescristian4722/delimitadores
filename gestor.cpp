@@ -69,42 +69,10 @@ void Gestor::menu()
         {
             case OPC_CAPTURAR:
             {
-                string codigo = "";
-                string nombre;
-                string apellido;
-                unsigned int edad;
-                char genero;
-                float altura;
-                float peso;
                 Usuario usuarioTmp;
-                
-                cout << " Ingrese los siguientes datos: "
-                     << endl
-                     << endl
-                     << " Código: ";
-                getline(cin, codigo);
-                cout << " Nombre: ";
-                getline(cin, nombre);
-                cout << " Apellido: ";
-                getline(cin, apellido);
-                cout << " Edad: ";
-                cin >> edad;
-                cout << " Género (M = masculino | F = femenino): ";
-                cin >> genero;
-                cout << " Peso: ";
-                cin >> peso;
-                cout << " Altura: ";
-                cin >> altura;;
-
-                usuarioTmp.setAltura(altura);
-                usuarioTmp.setApellido(apellido);
-                usuarioTmp.setCodigo(codigo);
-                usuarioTmp.setEdad(edad);
-                usuarioTmp.setGenero(genero);
-                usuarioTmp.setNombre(nombre);
-                usuarioTmp.setPeso(peso);
-
+                capturarDatos(usuarioTmp);
                 capturar(usuarioTmp);
+                cin.ignore();
             }
             break;
 
@@ -208,17 +176,9 @@ void Gestor::eliminar()
 }
 
 void Gestor::modificar()
-{
-    string codigo;
-    string nombre;
-    string apellido;
-    unsigned int edad;
-    unsigned int i;
-    char genero;
-    float altura;
-    float peso;
+{   
     Usuario usuarioTmp;
-    
+    unsigned int i;
     mostrar();
 
     if (m_usuarios.size())
@@ -228,33 +188,7 @@ void Gestor::modificar()
 
         if (i <= m_usuarios.size() && i)
         {
-            cin.ignore();
-            cout << " Ingrese los siguientes datos: "
-                 << endl
-                 << endl
-                 << " Código: ";
-
-            getline(cin, codigo);
-            cout << " Nombre: ";
-            getline(cin, nombre);
-            cout << " Apellido: ";
-            getline(cin, apellido);
-            cout << " Edad: ";
-            cin >> edad;
-            cout << " Género (M = masculino | F = femenino): ";
-            cin >> genero;
-            cout << " Peso: ";
-            cin >> peso;
-            cout << " Altura: ";
-            cin >> altura;
-
-            usuarioTmp.setAltura(altura);
-            usuarioTmp.setApellido(apellido);
-            usuarioTmp.setCodigo(codigo);
-            usuarioTmp.setEdad(edad);
-            usuarioTmp.setGenero(genero);
-            usuarioTmp.setNombre(nombre);
-            usuarioTmp.setPeso(peso);
+            capturarDatos(usuarioTmp);
 
             m_usuarios.erase(m_usuarios.begin() + i -1);
 
@@ -285,6 +219,8 @@ void Gestor::mostrar()
              << endl;
     if (!i)
         cout << " Aún no se han ingresado usuarios" << endl;
+    cout << endl << endl
+         << " Presione ENTER para continuar" << endl;
 }
 
 void Gestor::escribir()
@@ -303,7 +239,78 @@ void Gestor::escribir()
                     << m_usuarios[i].getAltura() << '\n';
 }
 
-void Gestor::capturarDatos(const Usuario& usuario)
+void Gestor::capturarDatos(Usuario& usuario)
 {
+    string codigo;
+    string nombre;
+    string apellido;
+    unsigned int edad;
+    string genero;
+    float altura;
+    float peso;
+
+    // Expresiones regulares
+    regex expCodigo("([1-9]{1}[0-9]{8})$");
+    regex expNombre("(?:[a-zA-ZñÑ]{4,})+(?: [a-zA-ZñÑ]{3,})?+");
+    regex expApellido("(?:[a-zA-ZñÑ]{4,})+(?: [a-zA-ZñÑ]{3,})$");
+    regex expGenero("(?:[mMfF]){1}$");
     
+    cout << " Presione ENTER para continuar e ingrese los siguientes datos"
+         << endl << endl;
+    do
+    {
+        CLEAR;
+        cout << " Código: ";
+        getline(cin, codigo);
+    } while (!regex_match(codigo, expCodigo));
+
+    do
+    {
+        CLEAR;
+        cout << " Nombre: ";
+        getline(cin, nombre);
+    } while (!regex_match(nombre, expNombre));
+
+    do
+    {
+        CLEAR;
+        cout << " Apellido: ";
+        getline(cin, apellido);
+    }while(!regex_match(apellido, expApellido));
+
+    do
+    {
+        CLEAR;
+        cout << " Edad (de 1 a 115 años): ";
+        cin >> edad;
+    }while(edad > 115 || !edad);
+
+    do
+    {
+        CLEAR;
+        cout << " Género (M = masculino | F = femenino): ";
+        cin >> genero;
+    } while(!regex_match(genero, expGenero));
+
+    do
+    {
+        CLEAR;
+        cout << " Peso (de 30 a 300 kg): ";
+        cin >> peso;
+    }while(peso > 300 || peso < 30);
+
+    do
+    {   
+        CLEAR;
+        cout << " Altura (de 0.8 a 2.5 mts): ";
+        cin >> altura;;
+    } while (altura < 0.8 || altura > 2.5);
+
+    usuario.setAltura(altura);
+    usuario.setApellido(apellido);
+    usuario.setCodigo(codigo);
+    usuario.setEdad(edad);
+    usuario.setGenero(genero[0]);
+    usuario.setNombre(nombre);
+    usuario.setPeso(peso);
 }

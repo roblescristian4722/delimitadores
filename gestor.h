@@ -27,7 +27,7 @@ public:
     void buscar();
     void eliminar();
     void escribir();
-    void capturarDatos(const Usuario& usuario);
+    void capturarDatos(Usuario& usuario);
 
 private:
     vector<Usuario> m_usuarios;
